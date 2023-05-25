@@ -3,25 +3,43 @@ from telegram import Update,ReplyKeyboardMarkup,KeyboardButton,InlineKeyboardMar
 import os
 from db import DB
 from cartdb import Cart
+from users import UserDB
 # get token from env
 TOKEN = os.environ['TOKEN']
-db = DB('SmartphoneBot/db.json')
-cart = Cart('SmartphoneBot/cartdb.json')
+db = DB('db.json')
+cart = Cart('cartdb.json')
+userdb = UserDB()
 
 
 def start(update: Update, context: CallbackContext):
+    # Get user id
     chat_id = update.message.chat.id
-
-    keyboar = ReplyKeyboardMarkup([
-        ['🛍 Shop','🛒 Cart'],
-        ['📞 Contact','📝 About']
-    ])
-    bot = context.bot
-    bot.sendMessage(
-    chat_id=chat_id,
-    text='Assalom alaykum xush kelibsiz botimizga 👍',
-    reply_markup=keyboar
-    )
+    # Check user in db
+    if not userdb.check_user(chat_id):
+        keyboar = ReplyKeyboardMarkup([
+            ['🛍 Shop','🛒 Cart'],
+            ['📞 Contact','📝 About']
+        ])
+        bot = context.bot
+        bot.sendMessage(
+        chat_id=chat_id,
+        text=f'Assalom alaykum <b>{update.effective_chat.first_name}</b> \n\nxush kelibsiz botimizga 👍',
+        reply_markup=keyboar,
+        parse_mode='HTML'
+        )
+        userdb.add_user(chat_id,update.effective_chat.first_name,update.effective_chat.last_name,update.effective_chat.username)
+    else:
+        keyboar = ReplyKeyboardMarkup([
+            ['🛍 Shop','🛒 Cart'],
+            ['📞 Contact','📝 About']
+        ])
+        bot = context.bot
+        bot.sendMessage(
+        chat_id=chat_id,
+        text=f'Assalom alaykum <b>{update.effective_chat.first_name}</b>, qaytganingizdan xursandmiz 👍',
+        reply_markup=keyboar,
+        parse_mode='HTML'
+        )
 
 def about(update: Update, context: CallbackContext):
     chat_id = update.message.chat.id
@@ -199,4 +217,4 @@ def main():
     updater.start_polling()
     updater.idle()
 
-# main()
+main()

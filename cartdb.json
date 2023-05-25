@@ -1,4 +1,12 @@
 {
     "cart": [
+        {
+            "brand": "Apple",
+            "model_id": "1"
+        },
+        {
+            "brand": "Apple",
+            "model_id": "17"
+        }
     ]
 }
